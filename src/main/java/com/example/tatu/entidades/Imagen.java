@@ -50,5 +50,13 @@ public class Imagen {
     public void setContenido(byte[] contenido) {
         this.contenido = contenido;
     }
+    public static Imagen fromDTO(String imagenUrl) {
+        // TODO Auto-generated method stub
+        throw new UnsupportedOperationException("Unimplemented method 'fromDTO'");
+    }
+    public static Object toDTO(Imagen imagen) {
+        // TODO Auto-generated method stub
+        throw new UnsupportedOperationException("Unimplemented method 'toDTO'");
+    }
     
 }

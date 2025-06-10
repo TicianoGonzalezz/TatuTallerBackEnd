@@ -9,6 +9,7 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 
 @Entity
@@ -19,7 +20,7 @@ public class Clase {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
      @ManyToOne
-     @Column(name = "id_profesor", nullable = false)
+     @JoinColumn(name = "profesor_id") // <--- Usa @JoinColumn, NO @Column
     private Usuario profesor;
     @Column(name = "nombre", nullable = false)
     private String nombre;
@@ -27,7 +28,7 @@ public class Clase {
     private String descripcion;
 
     @ManyToOne
-    @Column(name = "id_sede", nullable = false)
+    @JoinColumn(name = "sede_id") 
     private Sede sede;
     @Column(name = "horario_desde", nullable = false)
     private LocalDateTime horarioDesde;
@@ -91,4 +92,3 @@ public class Clase {
         this.horarioHasta = horarioHasta;
     }
 }
- 

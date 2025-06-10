@@ -1,18 +1,17 @@
 package com.example.tatu.controladores;
 
+import com.example.tatu.dto.UsuarioDTO;
+import com.example.tatu.servicios.UsuarioServicio;
+import com.example.tatu.excepciones.MiException;
+    import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
-import com.example.tatu.servicios.UsuarioServicio;
+import java.util.List;
 
 @RestController
 @RequestMapping("/usuario")
@@ -22,57 +21,85 @@ public class UsuarioControlador {
     private UsuarioServicio usuarioServicio;
 
     // CREATE
-    @PostMapping("/crear")
-    public ResponseEntity<Object> crearUsuario(MultipartFile archivo, String nombre, String email, String password, String password2) {
+    @PostMapping(value = "/crear", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public ResponseEntity<?> crearUsuario(
+            @RequestPart("usuario") String usuarioJson,
+            @RequestPart(value = "archivo", required = false) MultipartFile archivo,
+            @RequestParam String password,
+            @RequestParam String password2) {
         try {
-            usuarioServicio.registrar(archivo, nombre, email, password, password2);
-            return new ResponseEntity<>(HttpStatus.OK);
+            ObjectMapper mapper = new ObjectMapper();
+            UsuarioDTO usuarioDTO = mapper.readValue(usuarioJson, UsuarioDTO.class);
+            UsuarioDTO creado = usuarioServicio.registrar(usuarioDTO, archivo, password, password2);
+            return ResponseEntity.status(HttpStatus.CREATED).body(creado);
+        } catch (MiException e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
         } catch (Exception e) {
-            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error interno");
         }
     }
 
-    // READ
-    @GetMapping("/{id}")
-    public ResponseEntity<Object> obtenerUsuario(@PathVariable String id) {
-        var usuario = usuarioServicio.buscarPorId(id);
-        if (usuario != null) {
-            return new ResponseEntity<>(usuario, HttpStatus.OK);
-        } else {
-            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-        }
-    }
-
+    // READ ALL
     @GetMapping("/listar")
-    public ResponseEntity<Object> listarUsuarios() {
-        return new ResponseEntity<>(usuarioServicio.listarUsuarios(), HttpStatus.OK);
+    public ResponseEntity<List<UsuarioDTO>> listarUsuarios() {
+        List<UsuarioDTO> usuarios = usuarioServicio.listarUsuariosDTO();
+        return ResponseEntity.ok(usuarios);
+    }
+
+    // READ BY ID
+    @GetMapping("/{id}")
+    public ResponseEntity<?> obtenerUsuario(@PathVariable Long id) {
+        UsuarioDTO usuario = usuarioServicio.buscarPorIdDTO(id);
+        if (usuario != null) {
+            return ResponseEntity.ok(usuario);
+        } else {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Usuario no encontrado");
+        }
     }
 
     // UPDATE
-    @PutMapping("/modificar/{id}")
-    public ResponseEntity<Object> modificarUsuario(
-            @PathVariable String id,
-            MultipartFile archivo,
-            String nombre,
-            String email,
-            String password,
-            String password2) {
+    @PutMapping(value = "/actualizar/{id}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public ResponseEntity<?> actualizarUsuario(
+            @PathVariable Long id,
+            @RequestPart("usuario") String usuarioJson,
+            @RequestPart(value = "archivo", required = false) MultipartFile archivo,
+            @RequestParam(required = false) String password,
+            @RequestParam(required = false) String password2) {
         try {
-            usuarioServicio.actualizar(archivo, id, nombre, email, password, password2);
-            return new ResponseEntity<>(HttpStatus.OK);
+            ObjectMapper mapper = new ObjectMapper();
+            UsuarioDTO usuarioDTO = mapper.readValue(usuarioJson, UsuarioDTO.class);
+            UsuarioDTO actualizado = usuarioServicio.actualizar(id, usuarioDTO, archivo, password, password2);
+            return ResponseEntity.ok(actualizado);
+        } catch (MiException e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
         } catch (Exception e) {
-            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error interno");
         }
     }
 
     // DELETE
     @DeleteMapping("/eliminar/{id}")
-    public ResponseEntity<Object> eliminarUsuario(@PathVariable String id) {
+    public ResponseEntity<?> eliminarUsuario(@PathVariable Long id) {
         try {
             usuarioServicio.eliminar(id);
-            return new ResponseEntity<>(HttpStatus.OK);
-        } catch (Exception e) {
-            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+            return ResponseEntity.ok("Usuario eliminado correctamente");
+        } catch (MiException e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
         }
     }
+
+    // LOGIN
+    @PostMapping("/login")
+    public ResponseEntity<?> login(@RequestParam String email, @RequestParam String password) {
+        try {
+            UsuarioDTO usuario = usuarioServicio.login(email, password);
+            return ResponseEntity.ok(usuario);
+        } catch (MiException e) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(e.getMessage());
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error interno");
+        }
+    }
+
+    
 }

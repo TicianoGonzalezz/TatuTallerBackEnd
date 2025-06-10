@@ -48,22 +48,7 @@ public class ClaseServicio {
         }
     }
 
-    public List<Clase> buscarPorProfesor(Usuario profesor) {
-        return claseRepositorio.findByProfesor(profesor);
-    }
-    public List<Clase> buscarPorSede(Sede sede) {
-        return claseRepositorio.findBySede(sede);
-    }
-    public List<Clase> buscarPorNombre(String nombre) {
-        return claseRepositorio.findByNombreContainingIgnoreCase(nombre);
-    }
-    public List<Clase> buscarPorFecha(LocalDateTime fecha) {
-        return claseRepositorio.findByFecha(fecha);
-    }
-    public List<Clase> buscarPorFechaEntre(LocalDateTime fechaInicio, LocalDateTime fechaFin) {
-        return claseRepositorio.findByFechaBetween(fechaInicio, fechaFin);
-    }
-
+   
     public Clase buscarPorId(Long id) {
         return claseRepositorio.findById(id).orElse(null);
     }

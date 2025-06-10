@@ -6,15 +6,29 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 
 @Entity
 public class ReservaClase {
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    private Usuario usuario; // El cliente que realiza la reserva
-    private Clase clase; // La clase que se reserva
-    private LocalDateTime horarioReservaDesde; // Fecha y hora de la reserva
-    private EstadoReserva   estado; // Estado de la reserva (PENDIENTE, CONFIRMADA, CANCELADA)
+
+    @ManyToOne
+    @JoinColumn(name = "usuario_id")
+    private Usuario usuario;
+
+    @ManyToOne
+    @JoinColumn(name = "clase_id")
+    private Clase clase;
+
+    private LocalDateTime horarioReservaDesde;
+
+    @Enumerated(EnumType.STRING)
+    private EstadoReserva estado;
 
     public ReservaClase() {}
     public ReservaClase(Usuario usuario, Clase clase, LocalDateTime horarioReservaDesde, EstadoReserva estado) {

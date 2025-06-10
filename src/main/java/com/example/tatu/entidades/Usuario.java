@@ -11,6 +11,7 @@ import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
 import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
 
@@ -31,8 +32,8 @@ public class Usuario {
 @Column(name = "rol", nullable = false)
     @Enumerated(EnumType.STRING)
     private Rol rol;
-@Column(name = "imagen", nullable = false)
     @OneToOne
+    @JoinColumn(name = "imagen_id") // ✅ Esto es lo correcto
     private Imagen imagen;
 
     public Usuario() {
