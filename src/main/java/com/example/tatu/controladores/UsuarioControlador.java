@@ -3,7 +3,7 @@ package com.example.tatu.controladores;
 import com.example.tatu.dto.UsuarioDTO;
 import com.example.tatu.servicios.UsuarioServicio;
 import com.example.tatu.excepciones.MiException;
-    import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -19,6 +19,12 @@ public class UsuarioControlador {
 
     @Autowired
     private UsuarioServicio usuarioServicio;
+
+    // get de prueba para verificar que el controlador está funcionando
+    @GetMapping("/prueba")
+    public ResponseEntity<String> prueba() {
+        return ResponseEntity.ok("Controlador de Usuario funcionando correctamente");
+    }
 
     // CREATE
     @PostMapping(value = "/crear", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
@@ -88,7 +94,7 @@ public class UsuarioControlador {
         }
     }
 
-    // LOGIN    
+    // LOGIN
     @PostMapping("/login")
     public ResponseEntity<?> login(@RequestParam String email, @RequestParam String password) {
         try {
@@ -101,5 +107,4 @@ public class UsuarioControlador {
         }
     }
 
-    
 }

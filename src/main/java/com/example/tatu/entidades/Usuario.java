@@ -1,7 +1,5 @@
 package com.example.tatu.entidades;
 
-import org.hibernate.annotations.GenericGenerator;
-
 import com.example.tatu.enumeraciones.Rol;
 
 import jakarta.persistence.Column;
@@ -25,11 +23,11 @@ public class Usuario {
     private Long id;
     @Column(name = "nombre", nullable = false)
     private String nombre;
-@Column(name = "email", nullable = false, unique = true)
+    @Column(name = "email", nullable = false, unique = true)
     private String email;
-@Column(name = "password", nullable = false)
+    @Column(name = "password", nullable = false)
     private String password;
-@Column(name = "rol", nullable = false)
+    @Column(name = "rol", nullable = false)
     @Enumerated(EnumType.STRING)
     private Rol rol;
     @OneToOne
@@ -38,6 +36,7 @@ public class Usuario {
 
     public Usuario() {
     }
+
     public Usuario(String nombre, String email, String password, Rol rol) {
         this.nombre = nombre;
         this.email = email;
@@ -52,9 +51,11 @@ public class Usuario {
     public void setId(Long id) {
         this.id = id;
     }
+
     public Imagen getImagen() {
         return imagen;
     }
+
     public void setImagen(Imagen imagen) {
         this.imagen = imagen;
     }

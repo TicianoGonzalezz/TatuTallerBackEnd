@@ -9,7 +9,7 @@ public class TatuApplication {
 	public static void main(String[] args) {
 
 		// Start the Spring Boot application
-		  SpringApplication.run(TatuApplication.class, args);
+		SpringApplication.run(TatuApplication.class, args);
 	}
 
 }

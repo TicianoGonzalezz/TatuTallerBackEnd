@@ -1,7 +1,5 @@
 package com.example.tatu.entidades;
 
-import org.hibernate.annotations.GenericGenerator;
-
 import jakarta.persistence.Basic;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -13,50 +11,61 @@ import jakarta.persistence.Lob;
 
 @Entity
 public class Imagen {
-   @Id
+    @Id
     @GeneratedValue(strategy = GenerationType.UUID)
     @Column(name = "id_autor")
     private String id;
 
     private String mime;
     private String nombre;
-    
-    @Lob @Basic(fetch=FetchType.LAZY)//Carga la imagen lenta
+
+    @Lob
+    @Basic(fetch = FetchType.LAZY) // Carga la imagen lenta
     private byte[] contenido;
 
     public Imagen() {
     }
+
     public String getId() {
         return id;
     }
+
     public void setId(String id) {
         this.id = id;
     }
+
     public String getMime() {
         return mime;
     }
+
     public void setMime(String mime) {
         this.mime = mime;
     }
+
     public String getNombre() {
         return nombre;
     }
+
     public void setNombre(String nombre) {
         this.nombre = nombre;
     }
+
     public byte[] getContenido() {
         return contenido;
     }
+
     public void setContenido(byte[] contenido) {
         this.contenido = contenido;
     }
+
     public static Imagen fromDTO(String imagenUrl) {
         // TODO Auto-generated method stub
         throw new UnsupportedOperationException("Unimplemented method 'fromDTO'");
     }
+
     public static Object toDTO(Imagen imagen) {
         // TODO Auto-generated method stub
         throw new UnsupportedOperationException("Unimplemented method 'toDTO'");
     }
-    
+
 }
