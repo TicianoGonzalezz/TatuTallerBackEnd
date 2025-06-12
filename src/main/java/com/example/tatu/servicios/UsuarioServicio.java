@@ -43,15 +43,19 @@ public class UsuarioServicio implements UserDetailsService{
     private UsuarioDTOMapper usuarioDTOMapper;
 
     public UsuarioDTO registrar(UsuarioDTO usuarioDTO, MultipartFile archivo, String password, String password2) throws MiException {
-        validar(usuarioDTO.getNombre(), usuarioDTO.getEmail(), password, password2);
+        String rol = usuarioDTO.getRol();
+        if (rol == null) {
+            usuarioDTO.setRol("ALUMNO");
+        } else {
+            usuarioDTO.setRol(rol);
+        }
 
+        validarUsuarioRegistro(usuarioDTO.getNombre(), usuarioDTO.getEmail(), password, password2);
         Usuario usuario = usuarioDTOMapper.fromDTO(usuarioDTO);
-        usuario.setPassword(passwordEncoder.encode(password));
-        usuario.setRol(Rol.ALUMNO);
-
+        usuario.setRol(Rol.valueOf(rol.toUpperCase()));
+        usuario.setPassword(passwordEncoder.encode(password));     
         Imagen imagen = imagenServicio.guardar(archivo);
         usuario.setImagen(imagen);
-
         usuarioRepositorio.save(usuario);
         return usuarioDTOMapper.toDTO(usuario);
     }
@@ -81,16 +85,28 @@ public class UsuarioServicio implements UserDetailsService{
         }
     }
 
-    private void validar(String nombre, String email, String password, String password2) throws MiException {
-        if (nombre == null || nombre.isEmpty()) {
-            throw new MiException("el nombre no puede ser nulo o estar vacío");
+    
+
+    private void validarUsuarioRegistro(String nombre, String email, String password, String password2) throws MiException {
+        if (nombre == null || nombre.trim().isEmpty()) {
+            throw new MiException("El nombre es obligatorio");
         }
-        if (email == null || email.isEmpty()) {
-            throw new MiException("el email no puede ser nulo o estar vacío");
+        if (nombre.length() < 3) {
+            throw new MiException("El nombre debe tener al menos 3 caracteres");
         }
-        if (password == null || password.isEmpty() || password.length() <= 5) {
-            throw new MiException("La contraseña no puede estar vacía, y debe tener más de 5 dígitos");
+        if (email == null || email.trim().isEmpty()) {
+            throw new MiException("El email es obligatorio");
         }
+        if (!(email.endsWith("@gmail.com") || email.endsWith("@hotmail.com"))) {
+            throw new MiException("El email debe ser @gmail.com o @hotmail.com");
+        }
+        if (usuarioRepositorio.findByEmail(email) != null) {
+            throw new MiException("Ya existe un usuario con ese email");
+        }
+        if (password == null || password.isEmpty()) {
+            throw new MiException("La contraseña es obligatoria");
+        }
+        validarContrasena(password);
         if (!password.equals(password2)) {
             throw new MiException("Las contraseñas ingresadas deben ser iguales");
         }
@@ -102,6 +118,27 @@ public class UsuarioServicio implements UserDetailsService{
         if (respuesta.isPresent()) {
             Usuario usuario = respuesta.get();
 
+            // VALIDAR TODO ANTES DE MODIFICAR
+            if (usuarioDTO.getNombre() != null && usuarioDTO.getNombre().isEmpty() && usuario.getNombre().length()<4) {
+                throw new MiException("El nombre no puede estar vacío y debe tener al menos 4 letras");
+            }
+            if (usuarioDTO.getEmail() != null && usuarioDTO.getEmail().isEmpty() ) {
+                throw new MiException("El email no puede estar vacío");
+            }
+            if(usuarioDTO.getEmail() != null && !usuarioDTO.getEmail().equals(respuesta.get().getEmail())) {
+                Usuario usuarioExistente = usuarioRepositorio.findByEmail(usuarioDTO.getEmail());
+                if (usuarioExistente != null && !usuarioExistente.getId().equals(id)) {
+                    throw new MiException("Ya existe un usuario con ese email");
+                }
+            }
+            if (password != null && !password.isEmpty()) {
+                validarContrasena(password);
+                if (!password.equals(password2)) {
+                    throw new MiException("Las contraseñas ingresadas deben ser iguales");
+                }
+            }
+
+            // SI TODO ES VÁLIDO, RECIÉN AHÍ MODIFICÁS
             if (usuarioDTO.getNombre() != null && !usuarioDTO.getNombre().isEmpty()) {
                 usuario.setNombre(usuarioDTO.getNombre());
             }
@@ -109,14 +146,18 @@ public class UsuarioServicio implements UserDetailsService{
                 usuario.setEmail(usuarioDTO.getEmail());
             }
             if (password != null && !password.isEmpty()) {
-                if (!password.equals(password2)) {
-                    throw new MiException("Las contraseñas ingresadas deben ser iguales");
-                }
                 usuario.setPassword(passwordEncoder.encode(password));
             }
             if (archivo != null && !archivo.isEmpty()) {
                 Imagen imagen = imagenServicio.guardar(archivo);
                 usuario.setImagen(imagen);
+            }
+            if (usuarioDTO.getRol() != null) {
+                try {
+                    usuario.setRol(Rol.valueOf(usuarioDTO.getRol().toUpperCase()));
+                } catch (IllegalArgumentException e) {
+                    throw new MiException("Rol inválido");
+                }
             }
 
             usuarioRepositorio.save(usuario);
@@ -125,6 +166,26 @@ public class UsuarioServicio implements UserDetailsService{
             throw new MiException("Usuario no encontrado");
         }
     }
+
+    public boolean validarContrasena(String contrasena) throws MiException {
+    if (contrasena == null || contrasena.isEmpty()) {
+        throw new MiException("La contraseña no puede estar vacía");
+    }
+    if (contrasena.length() < 8) {
+        throw new MiException("La contraseña debe tener al menos 8 caracteres");
+    }
+    if (!contrasena.matches(".*[A-Za-z].*")) {
+        throw new MiException("La contraseña debe contener al menos una letra");
+    }
+    if (!contrasena.matches(".*\\d.*")) {
+        throw new MiException("La contraseña debe contener al menos un número");
+    }
+    if (!contrasena.matches(".*[@$!%*#?&].*")) {
+        throw new MiException("La contraseña debe contener al menos un carácter especial (@$!%*#?&)");
+    }
+    return true;
+}
+
 
 
     public UsuarioDTO login(String email, String password) throws MiException {

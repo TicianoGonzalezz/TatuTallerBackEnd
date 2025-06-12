@@ -1,5 +1,6 @@
 package com.example.tatu.controladores;
 
+import com.example.tatu.JwtUtil;
 import com.example.tatu.dto.UsuarioDTO;
 import com.example.tatu.servicios.UsuarioServicio;
 import com.example.tatu.excepciones.MiException;
@@ -12,6 +13,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/usuario")
@@ -30,6 +32,7 @@ public class UsuarioControlador {
         try {
             ObjectMapper mapper = new ObjectMapper();
             UsuarioDTO usuarioDTO = mapper.readValue(usuarioJson, UsuarioDTO.class);
+
             UsuarioDTO creado = usuarioServicio.registrar(usuarioDTO, archivo, password, password2);
             return ResponseEntity.status(HttpStatus.CREATED).body(creado);
         } catch (MiException e) {
@@ -89,17 +92,18 @@ public class UsuarioControlador {
     }
 
     // LOGIN    
-    @PostMapping("/login")
-    public ResponseEntity<?> login(@RequestParam String email, @RequestParam String password) {
-        try {
-            UsuarioDTO usuario = usuarioServicio.login(email, password);
-            return ResponseEntity.ok(usuario);
-        } catch (MiException e) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(e.getMessage());
-        } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error interno");
-        }
+@PostMapping("/login")
+public ResponseEntity<?> login(@RequestParam String email, @RequestParam String password) {
+    try {
+        UsuarioDTO usuario = usuarioServicio.login(email, password);
+        String token = JwtUtil.generateToken(email);
+        return ResponseEntity.ok().body(Map.of("token", token, "usuario", usuario));
+    } catch (MiException e) {
+        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(e.getMessage());
+    } catch (Exception e) {
+        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error interno");
     }
+}
 
     
 }
