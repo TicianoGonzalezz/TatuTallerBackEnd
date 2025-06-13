@@ -24,7 +24,6 @@ public class Clase {
     private String nombre;
     @Column(name = "descripcion", nullable = false)
     private String descripcion;
-
     @ManyToOne
     @JoinColumn(name = "sede_id")
     private Sede sede;
