@@ -45,14 +45,14 @@ public class UsuarioControlador {
         }
     }
 
-    // READ ALL
+    // get ALL
     @GetMapping("/listar")
     public ResponseEntity<List<UsuarioDTO>> listarUsuarios() {
         List<UsuarioDTO> usuarios = usuarioServicio.listarUsuariosDTO();
         return ResponseEntity.ok(usuarios);
     }
 
-    // READ BY ID
+    // get BY ID
     @GetMapping("/{id}")
     public ResponseEntity<?> obtenerUsuario(@PathVariable Long id) {
         UsuarioDTO usuario = usuarioServicio.buscarPorIdDTO(id);
