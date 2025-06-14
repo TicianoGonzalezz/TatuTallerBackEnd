@@ -12,7 +12,7 @@ import com.example.tatu.entidades.ReservaClase;
 
 @Repository
 public interface ReservaClaseRepositorio extends JpaRepository<ReservaClase, Long> {
-    int countByClaseAndFecha(Clase clase, LocalDate fecha);
+    int countByClaseAndFechaReserva(Clase clase, LocalDate fechaReserva);
 
     List<ReservaClase> findByUsuarioId(Long usuarioId);
 }

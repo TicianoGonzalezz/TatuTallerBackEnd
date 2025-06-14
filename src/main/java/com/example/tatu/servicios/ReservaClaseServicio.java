@@ -49,7 +49,7 @@ public class ReservaClaseServicio {
 
                 if ("PUNTUAL".equalsIgnoreCase(dto.getTipoReserva())) {
                         LocalDate fecha = LocalDate.parse(dto.getFecha());
-                        if (reservaClaseRepositorio.countByClaseAndFecha(clase, fecha) >= clase.getCapacidad())
+                        if (reservaClaseRepositorio.countByClaseAndFechaReserva(clase, fecha) >= clase.getCapacidad())
                                 throw new MiException("Sin cupo disponible");
                         ReservaClase reserva = new ReservaClase();
                         reserva.setUsuario(usuario);
@@ -65,7 +65,7 @@ public class ReservaClaseServicio {
                         List<ReservaClase> reservas = new ArrayList<>();
                         while (f.getMonth() == ym.getMonth()) {
                                 if (f.getDayOfWeek().getValue() == clase.getDiaSemana()) {
-                                        if (reservaClaseRepositorio.countByClaseAndFecha(clase, fecha) < clase
+                                        if (reservaClaseRepositorio.countByClaseAndFechaReserva(clase, fecha) < clase
                                                         .getCapacidad()) {
                                                 ReservaClase reserva = new ReservaClase();
                                                 reserva.setUsuario(usuario);
@@ -107,7 +107,7 @@ public class ReservaClaseServicio {
                 List<Clase> clases = claseRepositorio.findByDiaSemana(diaSemana);
                 List<ClaseDisponibleDTO> disponibles = new ArrayList<>();
                 for (Clase clase : clases) {
-                        int reservas = reservaClaseRepositorio.countByClaseAndFecha(clase, fecha);
+                        int reservas = reservaClaseRepositorio.countByClaseAndFechaReserva(clase, fecha);
                         int cupoDisponible = clase.getCapacidad() - reservas;
                         if (cupoDisponible > 0) {
                                 ClaseDisponibleDTO dto = new ClaseDisponibleDTO();
