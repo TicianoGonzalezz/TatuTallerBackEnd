@@ -1,15 +1,19 @@
 package com.example.tatu;
 
+import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
-import io.jsonwebtoken.Claims;
 import java.util.Date;
 import javax.crypto.spec.SecretKeySpec;
 import java.security.Key;
 import java.nio.charset.StandardCharsets;
 
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.stereotype.Component;
+
+@Component
 public class JwtUtil {
-    private static final String SECRET_KEY = "zF8kR9pT2xY7aBQQ!3zF8kR9pT2xY7aBQQ!y66!";
+    private static final String SECRET_KEY = "mdkoamsdklalkdlakemdklemkfmseklfeosio332!!!!we21qPDAOW456";
 
     public static String generateToken(String email) {
         Key key = new SecretKeySpec(SECRET_KEY.getBytes(StandardCharsets.UTF_8), SignatureAlgorithm.HS256.getJcaName());
@@ -21,15 +25,16 @@ public class JwtUtil {
                 .compact();
     }
 
-  public static String extractEmail(String token) {
-    Key key = new SecretKeySpec(SECRET_KEY.getBytes(StandardCharsets.UTF_8), SignatureAlgorithm.HS256.getJcaName());
-    return Jwts.parserBuilder()
-            .setSigningKey(key)
-            .build()
-            .parseClaimsJws(token)
-            .getBody()
-            .getSubject();
-}
+    public static String extractEmail(String token) {
+        Key key = new SecretKeySpec(SECRET_KEY.getBytes(StandardCharsets.UTF_8), SignatureAlgorithm.HS256.getJcaName());
+        return Jwts.parserBuilder()
+                .setSigningKey(key)
+                .build()
+                .parseClaimsJws(token)
+                .getBody()
+                .getSubject();
+    }
+
     public static boolean validateToken(String token) {
         try {
             Key key = new SecretKeySpec(SECRET_KEY.getBytes(StandardCharsets.UTF_8), SignatureAlgorithm.HS256.getJcaName());
@@ -43,4 +48,25 @@ public class JwtUtil {
             return false;
         }
     }
+
+    // Add this method to extract username from JWT token
+    public String extractUsername(String token) {
+        return extractAllClaims(token).getSubject();
+    }
+
+    private Claims extractAllClaims(String token) {
+        Key key = new SecretKeySpec(SECRET_KEY.getBytes(StandardCharsets.UTF_8), SignatureAlgorithm.HS256.getJcaName());
+        return Jwts.parserBuilder()
+                .setSigningKey(key)
+                .build()
+                .parseClaimsJws(token)
+                .getBody();
+    }
+
+    public Boolean validateToken(String token, UserDetails userDetails) {
+        final String username = extractUsername(token);
+        return (username.equals(userDetails.getUsername()));
+    }
+
+    // ...otros métodos...
 }
