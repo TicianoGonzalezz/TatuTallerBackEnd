@@ -1,6 +1,7 @@
 package com.example.tatu.mapper;
 
 import java.time.LocalDateTime;
+import java.time.LocalTime;
 
 import org.springframework.stereotype.Component;
 
@@ -19,8 +20,9 @@ public class ClaseDTOMapper {
         dto.setId(clase.getId());
         dto.setNombre(clase.getNombre());
         dto.setDescripcion(clase.getDescripcion());
-        dto.setHorarioDesde(clase.getHorarioDesde().toString());
-        dto.setHorarioHasta(clase.getHorarioHasta().toString());
+        dto.setHoraDesde(clase.getHorarioDesde().toString());
+        dto.setHoraHasta(clase.getHorarioHasta().toString());
+        dto.setDiaSemana(clase.getDiaSemana());
         dto.setSedeId(clase.getSede().getId());
         dto.setProfesorId(clase.getProfesor().getId());
         return dto;
@@ -34,8 +36,9 @@ public class ClaseDTOMapper {
         clase.setId(dto.getId());
         clase.setNombre(dto.getNombre());
         clase.setDescripcion(dto.getDescripcion());
-        clase.setHorarioDesde(LocalDateTime.parse(dto.getHorarioDesde()));
-        clase.setHorarioHasta(LocalDateTime.parse(dto.getHorarioHasta()));
+        clase.setDiaSemana(dto.getDiaSemana());
+        clase.setHorarioDesde(LocalTime.parse(dto.getHoraDesde()));
+        clase.setHorarioHasta(LocalTime.parse(dto.getHoraHasta()));
         // Aquí se debería buscar el profesor y la sede por sus IDs
         // clase.setProfesor(usuarioRepositorio.findById(dto.getProfesorId()).orElse(null));
         // clase.setSede(sedeRepositorio.findById(dto.getSedeId()).orElse(null));

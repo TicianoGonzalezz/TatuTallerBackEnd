@@ -1,7 +1,9 @@
 package com.example.tatu.entidades;
 
 import java.time.LocalDateTime;
+import java.time.LocalTime;
 
+import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -25,46 +27,73 @@ public class ReservaClase {
     @JoinColumn(name = "clase_id")
     private Clase clase;
 
-    private LocalDateTime horarioReservaDesde;
+    @Column(name = "horario_desde", nullable = false)
+    private LocalTime horaDesde;
+
+    @Column(name = "horario_hasta", nullable = false)
+    private LocalTime horaHasta;
 
     @Enumerated(EnumType.STRING)
     private EstadoReserva estado;
 
-    public ReservaClase() {}
-    public ReservaClase(Usuario usuario, Clase clase, LocalDateTime horarioReservaDesde, EstadoReserva estado) {
+    public ReservaClase() {
+    }
+
+    public ReservaClase(Usuario usuario, Clase clase, LocalTime horarioDesde, LocalTime horarioHasta,
+            EstadoReserva estado) {
         this.usuario = usuario;
         this.clase = clase;
-        this.horarioReservaDesde = horarioReservaDesde;
+        this.horaDesde = horarioDesde;
+        this.horaHasta = horarioHasta;
         this.estado = estado;
     }
+
     public Long getId() {
         return id;
     }
+
     public void setId(Long id) {
         this.id = id;
     }
+
     public Usuario getUsuario() {
         return usuario;
     }
+
     public void setUsuario(Usuario usuario) {
         this.usuario = usuario;
     }
+
     public Clase getClase() {
         return clase;
     }
-    public void setClase(Clase clase) {
-        this.clase = clase;}
-    public LocalDateTime getHorarioReservaDesde() {
-        return horarioReservaDesde;
-    }
-    public void setHorarioReservaDesde(LocalDateTime horarioReservaDesde) {
-        this.horarioReservaDesde = horarioReservaDesde;
-    }
-    public EstadoReserva getEstado() {
-        return estado;}
-    public void setEstado(EstadoReserva estado) {
-        this.estado = estado;}
-        
 
+    public void setClase(Clase clase) {
+        this.clase = clase;
+    }
+
+    public LocalTime getHorarioReservaDesde() {
+        return horaDesde;
+    }
+
+    public void setHorarioReservaDesde(LocalTime horarioReservaDesde) {
+        this.horaDesde = horarioReservaDesde;
+    }
+
+    public LocalTime getHorarioReservaHasta() {
+        return horaHasta;
+    }
+
+    public void setHorarioReservaHasta(LocalTime horarioReservaHasta) {
+        this.horaHasta = horarioReservaHasta;
+    }
+
+    public EstadoReserva getEstado() {
+        return estado;
+    }
+
+    public void setEstado(EstadoReserva estado) {
+        this.estado = estado;
+    }
 
 }
