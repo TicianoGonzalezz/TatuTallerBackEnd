@@ -1,7 +1,6 @@
 package com.example.tatu.entidades;
 
-import java.time.LocalDateTime;
-import java.time.LocalTime;
+import java.time.LocalDate;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -27,25 +26,33 @@ public class ReservaClase {
     @JoinColumn(name = "clase_id")
     private Clase clase;
 
-    @Column(name = "horario_desde", nullable = false)
-    private LocalTime horaDesde;
-
-    @Column(name = "horario_hasta", nullable = false)
-    private LocalTime horaHasta;
+    @Column(name = "fecha_reserva")
+    private LocalDate fechaReserva;
 
     @Enumerated(EnumType.STRING)
     private EstadoReserva estado;
 
+    @Enumerated(EnumType.STRING)
+    private TipoReserva tipoReserva;
+
     public ReservaClase() {
     }
 
-    public ReservaClase(Usuario usuario, Clase clase, LocalTime horarioDesde, LocalTime horarioHasta,
-            EstadoReserva estado) {
+    public TipoReserva getTipoReserva() {
+        return tipoReserva;
+    }
+
+    public void setTipoReserva(TipoReserva tipoReserva) {
+        this.tipoReserva = tipoReserva;
+    }
+
+    public ReservaClase(Usuario usuario, Clase clase, LocalDate fecha,
+            EstadoReserva estado, TipoReserva tipoReserva) {
         this.usuario = usuario;
         this.clase = clase;
-        this.horaDesde = horarioDesde;
-        this.horaHasta = horarioHasta;
         this.estado = estado;
+        this.tipoReserva = tipoReserva;
+        this.fechaReserva = fecha;
     }
 
     public Long getId() {
@@ -72,20 +79,12 @@ public class ReservaClase {
         this.clase = clase;
     }
 
-    public LocalTime getHorarioReservaDesde() {
-        return horaDesde;
+    public LocalDate getFechaReserva() {
+        return fechaReserva;
     }
 
-    public void setHorarioReservaDesde(LocalTime horarioReservaDesde) {
-        this.horaDesde = horarioReservaDesde;
-    }
-
-    public LocalTime getHorarioReservaHasta() {
-        return horaHasta;
-    }
-
-    public void setHorarioReservaHasta(LocalTime horarioReservaHasta) {
-        this.horaHasta = horarioReservaHasta;
+    public void setFechaReserva(LocalDate fecha) {
+        this.fechaReserva = fecha;
     }
 
     public EstadoReserva getEstado() {

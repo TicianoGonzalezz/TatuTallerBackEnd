@@ -28,9 +28,8 @@ public class ReservaClaseDTOMapper {
         dto.setId(reserva.getId());
         dto.setUsuarioId(reserva.getUsuario().getId());
         dto.setClaseId(reserva.getClase().getId());
-        dto.setHoraDesde(reserva.getHorarioReservaDesde().toString());
-        dto.setHoraHasta(reserva.getHorarioReservaHasta().toString());
         dto.setEstado(reserva.getEstado().name());
+        dto.setTipoReserva(reserva.getTipoReserva().toString());
         return dto;
     }
 
@@ -42,8 +41,6 @@ public class ReservaClaseDTOMapper {
         reserva.setId(dto.getId());
         reserva.setUsuario(usuarioRepositorio.findById(dto.getUsuarioId()).orElse(null));
         reserva.setClase(claseRepositorio.findById(dto.getClaseId()).orElse(null));
-        reserva.setHorarioReservaDesde(LocalTime.parse(dto.getHoraDesde()));
-        reserva.setHorarioReservaHasta(LocalTime.parse(dto.getHoraHasta()));
         reserva.setEstado(EstadoReserva.valueOf(dto.getEstado()));
         return reserva;
     }

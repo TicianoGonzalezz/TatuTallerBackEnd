@@ -10,5 +10,5 @@ import com.example.tatu.entidades.Clase;
 
 @Repository
 public interface ClaseRepositorio extends JpaRepository<Clase, Long> {
-
+    List<Clase> findByDiaSemana(Integer diaSemana);
 }

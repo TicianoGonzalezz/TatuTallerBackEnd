@@ -1,5 +1,7 @@
 package com.example.tatu.servicios;
 
+import java.util.List;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
@@ -33,7 +35,8 @@ public class EmailServicio {
                         "Tienes una nueva reserva de clase:\n" +
                         "Usuario: " + reserva.getUsuario().getNombre() + "\n" +
                         "Fecha: " + reserva.getClase().getDiaSemana() + "\n" +
-                        "Hora : " + reserva.getHorarioReservaDesde() + " - " + reserva.getHorarioReservaHasta() + "\n\n"
+                        "Hora : " + reserva.getClase().getHorarioDesde() + " - " + reserva.getClase().getHorarioHasta()
+                        + "\n\n"
                         +
                         "Por favor, confirma o rechaza la reserva usando los siguientes enlaces:\n" +
                         "Confirmar: " + linkConfirmar + "\n" +
@@ -58,7 +61,8 @@ public class EmailServicio {
                 ? "Hola " + reserva.getUsuario().getNombre() + ",\n\n" +
                         "Tu reserva de clase ha sido aceptada.\n" +
                         "Fecha: " + reserva.getClase().getDiaSemana() + "\n" +
-                        "Hora: " + reserva.getHorarioReservaDesde() + " - " + reserva.getHorarioReservaHasta() + "\n\n"
+                        "Hora: " + reserva.getClase().getHorarioDesde() + " - " + reserva.getClase().getHorarioHasta()
+                        + "\n\n"
                         +
                         "Saludos,\nEl equipo de Tatu"
                 : "Hola " + reserva.getUsuario().getNombre() + ",\n\n" +
@@ -71,5 +75,10 @@ public class EmailServicio {
         mail.setText(mensajeTexto);
         mailSender.send(mail);
 
+    }
+
+    public void enviarMailConfirmacionPorLote(List<ReservaClase> reservas) {
+        // TODO Auto-generated method stub
+        throw new UnsupportedOperationException("Unimplemented method 'enviarMailConfirmacionPorLote'");
     }
 }

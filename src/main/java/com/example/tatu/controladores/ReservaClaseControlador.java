@@ -1,5 +1,6 @@
 package com.example.tatu.controladores;
 
+import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 
@@ -8,7 +9,9 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import com.example.tatu.dto.ClaseDisponibleDTO;
 import com.example.tatu.dto.ReservaClaseDTO;
+import com.example.tatu.dto.ReservaRequestDTO;
 import com.example.tatu.excepciones.MiException;
 import com.example.tatu.servicios.ReservaClaseServicio;
 
@@ -28,13 +31,15 @@ public class ReservaClaseControlador {
      * @throws MiException si ocurre un error durante la creación.
      */
     @PostMapping
-    public ResponseEntity<?> crearReserva(@RequestBody ReservaClaseDTO reservaClaseDTO) {
+    public ResponseEntity<?> crearReserva(@RequestBody ReservaRequestDTO req) {
+
         try {
-            ReservaClaseDTO creada = reservaClaseServicio.crear(reservaClaseDTO);
-            return ResponseEntity.status(HttpStatus.CREATED).body(creada);
+            reservaClaseServicio.reservar(req);
+            return ResponseEntity.ok().build();
         } catch (MiException e) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
         }
+
     }
 
     // Método para listar todas las reservas de clase
@@ -46,6 +51,43 @@ public class ReservaClaseControlador {
     @GetMapping
     public ResponseEntity<List<ReservaClaseDTO>> listar() {
         return ResponseEntity.ok(reservaClaseServicio.listar());
+    }
+
+    @GetMapping("/disponibles")
+    public List<ClaseDisponibleDTO> clasesDisponibles(@RequestParam String fecha) {
+        return reservaClaseServicio.clasesDisponiblesPorFecha(LocalDate.parse(fecha));
+    }
+
+    // 2. Reservar clase puntual o mensual
+    @PostMapping("/reservas")
+    public ResponseEntity<?> reservar(@RequestBody ReservaRequestDTO req) {
+        try {
+            reservaClaseServicio.reservar(req);
+            return ResponseEntity.ok().build();
+        } catch (MiException e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
+
+        }
+
+    }
+
+    // 3. Confirmar/rechazar reserva (profesor)
+    @GetMapping("/confirmar")
+    public ResponseEntity<String> confirmar(@RequestParam Long reservaId) {
+        reservaClaseServicio.confirmarReserva(reservaId);
+        return ResponseEntity.ok("Reserva confirmada");
+    }
+
+    @GetMapping("/rechazar")
+    public ResponseEntity<String> rechazar(@RequestParam Long reservaId) {
+        reservaClaseServicio.rechazarReserva(reservaId);
+        return ResponseEntity.ok("Reserva rechazada");
+    }
+
+    // 4. Ver reservas del usuario
+    @GetMapping("/usuario/{usuarioId}")
+    public List<ReservaClaseDTO> reservasPorUsuario(@PathVariable Long usuarioId) {
+        return reservaClaseServicio.reservasPorUsuario(usuarioId);
     }
 
     // Método para buscar una reserva por ID

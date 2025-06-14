@@ -37,6 +37,9 @@ public class Clase {
     @Column(name = "horario_hasta", nullable = false)
     private LocalTime horarioHasta;
 
+    @Column(nullable = false)
+    private Integer capacidad = 6;
+
     public Integer getDiaSemana() {
         return diaSemana;
     }
@@ -64,6 +67,14 @@ public class Clase {
         this.descripcion = descripcion;
         this.horarioDesde = horarioDesde;
         this.horarioHasta = horarioHasta;
+    }
+
+    public Integer getCapacidad() {
+        return capacidad;
+    }
+
+    public void setCapacidad(Integer capacidad) {
+        this.capacidad = capacidad;
     }
 
     public Long getId() {
