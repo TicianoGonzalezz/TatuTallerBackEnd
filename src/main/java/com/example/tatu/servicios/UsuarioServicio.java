@@ -1,4 +1,5 @@
 package com.example.tatu.servicios;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -29,7 +30,7 @@ import jakarta.servlet.http.HttpSession;
 import jakarta.transaction.Transactional;
 
 @Service
-public class UsuarioServicio implements UserDetailsService{ 
+public class UsuarioServicio implements UserDetailsService {
 
     @Autowired
     private UsuarioRepositorio usuarioRepositorio;
@@ -50,6 +51,7 @@ public class UsuarioServicio implements UserDetailsService{
             usuarioDTO.setRol(rol);
         }
 
+
         validarUsuarioRegistro(usuarioDTO.getNombre(), usuarioDTO.getEmail(), password, password2);
         Usuario usuario = usuarioDTOMapper.fromDTO(usuarioDTO);
         usuario.setRol(Rol.valueOf(rol.toUpperCase()));
@@ -60,7 +62,6 @@ public class UsuarioServicio implements UserDetailsService{
         return usuarioDTOMapper.toDTO(usuario);
     }
 
-   
     public UsuarioDTO buscarPorIdDTO(Long id) {
         Optional<Usuario> respuesta = usuarioRepositorio.findById(id);
         if (respuesta.isPresent()) {
@@ -69,13 +70,13 @@ public class UsuarioServicio implements UserDetailsService{
             return null; // O lanzar una excepción si prefieres
         }
     }
-    
+
     public List<UsuarioDTO> listarUsuariosDTO() {
         return usuarioRepositorio.findAll().stream()
-            .map(usuarioDTOMapper::toDTO)
-            .collect(Collectors.toList());
+                .map(usuarioDTOMapper::toDTO)
+                .collect(Collectors.toList());
     }
-    
+
     public void eliminar(Long id) throws MiException {
         Optional<Usuario> respuesta = usuarioRepositorio.findById(id);
         if (respuesta.isPresent()) {
@@ -113,7 +114,8 @@ public class UsuarioServicio implements UserDetailsService{
     }
 
     @Transactional
-    public UsuarioDTO actualizar(Long id, UsuarioDTO usuarioDTO, MultipartFile archivo, String password, String password2) throws MiException {
+    public UsuarioDTO actualizar(Long id, UsuarioDTO usuarioDTO, MultipartFile archivo, String password,
+            String password2) throws MiException {
         Optional<Usuario> respuesta = usuarioRepositorio.findById(id);
         if (respuesta.isPresent()) {
             Usuario usuario = respuesta.get();
@@ -167,6 +169,7 @@ public class UsuarioServicio implements UserDetailsService{
         }
     }
 
+
     public boolean validarContrasena(String contrasena) throws MiException {
     if (contrasena == null || contrasena.isEmpty()) {
         throw new MiException("La contraseña no puede estar vacía");
@@ -187,7 +190,6 @@ public class UsuarioServicio implements UserDetailsService{
 }
 
 
-
     public UsuarioDTO login(String email, String password) throws MiException {
         Usuario usuario = usuarioRepositorio.findByEmail(email);
         if (usuario == null) {
@@ -199,7 +201,6 @@ public class UsuarioServicio implements UserDetailsService{
         return usuarioDTOMapper.toDTO(usuario);
     }
 
-
     @Override
     public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
         Usuario usuario = usuarioRepositorio.findByEmail(email);
@@ -207,12 +208,13 @@ public class UsuarioServicio implements UserDetailsService{
             List<GrantedAuthority> permisos = new ArrayList<>();
             GrantedAuthority p = new SimpleGrantedAuthority("ROLE_" + usuario.getRol().toString());
             permisos.add(p);
-            ServletRequestAttributes attributes= (ServletRequestAttributes) RequestContextHolder.currentRequestAttributes();
+            ServletRequestAttributes attributes = (ServletRequestAttributes) RequestContextHolder
+                    .currentRequestAttributes();
             HttpSession session = attributes.getRequest().getSession(true);
             session.setAttribute("usuariosession", usuario); // Guardamos el usuario en la sesión
-           return new User(usuario.getEmail(), usuario.getPassword(), permisos);
+            return new User(usuario.getEmail(), usuario.getPassword(), permisos);
 
-        }else {
+        } else {
             return null; // Si el usuario no existe, retornamos null
         }
     }

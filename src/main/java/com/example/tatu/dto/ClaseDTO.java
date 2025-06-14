@@ -6,10 +6,10 @@ public class ClaseDTO {
     private String descripcion;
     private Long profesorId;
     private Long sedeId;
-    private String horarioDesde;
-    private String horarioHasta;
+    private Integer diaSemana;
+    private String horaDesde;
+    private String horaHasta;
 
-    // Getters y Setters
     public Long getId() {
         return id;
     }
@@ -50,20 +50,30 @@ public class ClaseDTO {
         this.sedeId = sedeId;
     }
 
-    public String getHorarioDesde() {
-        return horarioDesde;
+    public Integer getDiaSemana() {
+        return diaSemana;
     }
 
-    public void setHorarioDesde(String horarioDesde) {
-        this.horarioDesde = horarioDesde;
+    public void setDiaSemana(Integer diaSemana) {
+        this.diaSemana = diaSemana;
     }
 
-    public String getHorarioHasta() {
-        return horarioHasta;
+    public String getHoraDesde() {
+        return horaDesde;
     }
 
-    public void setHorarioHasta(String horarioHasta) {
-        this.horarioHasta = horarioHasta;
+    public void setHoraDesde(String horaDesde) {
+        this.horaDesde = horaDesde;
     }
+
+    public String getHoraHasta() {
+        return horaHasta;
+    }
+
+    public void setHoraHasta(String horaHasta) {
+        this.horaHasta = horaHasta;
+    }
+
+    // Getters y Setters
 
 }

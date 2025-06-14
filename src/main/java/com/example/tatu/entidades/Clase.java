@@ -1,6 +1,7 @@
 package com.example.tatu.entidades;
 
 import java.time.LocalDateTime;
+import java.time.LocalTime;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -27,22 +28,53 @@ public class Clase {
     @ManyToOne
     @JoinColumn(name = "sede_id")
     private Sede sede;
+
+    @Column(name = "dia_semana", nullable = false)
+    private Integer diaSemana;
+
     @Column(name = "horario_desde", nullable = false)
-    private LocalDateTime horarioDesde;
+    private LocalTime horarioDesde;
     @Column(name = "horario_hasta", nullable = false)
-    private LocalDateTime horarioHasta;
+    private LocalTime horarioHasta;
+
+    @Column(nullable = false)
+    private Integer capacidad = 6;
+
+    public Integer getDiaSemana() {
+        return diaSemana;
+    }
+
+    public void setDiaSemana(Integer diaSemana) {
+        this.diaSemana = diaSemana;
+    }
+
+    public void setHorarioDesde(LocalTime horarioDesde) {
+        this.horarioDesde = horarioDesde;
+    }
+
+    public void setHorarioHasta(LocalTime horarioHasta) {
+        this.horarioHasta = horarioHasta;
+    }
 
     public Clase() {
     }
 
-    public Clase(String descripcion, Usuario profesor, Sede sede, String nombre, LocalDateTime horarioDesde,
-            LocalDateTime horarioHasta) {
+    public Clase(String descripcion, Usuario profesor, Sede sede, String nombre, LocalTime horarioDesde,
+            LocalTime horarioHasta) {
         this.nombre = nombre;
         this.profesor = profesor;
         this.sede = sede;
         this.descripcion = descripcion;
         this.horarioDesde = horarioDesde;
         this.horarioHasta = horarioHasta;
+    }
+
+    public Integer getCapacidad() {
+        return capacidad;
+    }
+
+    public void setCapacidad(Integer capacidad) {
+        this.capacidad = capacidad;
     }
 
     public Long getId() {
@@ -61,14 +93,6 @@ public class Clase {
         this.profesor = profesor;
     }
 
-    public Sede getSede() {
-        return sede;
-    }
-
-    public void setSede(Sede sede) {
-        this.sede = sede;
-    }
-
     public String getNombre() {
         return nombre;
     }
@@ -85,19 +109,20 @@ public class Clase {
         this.descripcion = descripcion;
     }
 
-    public LocalDateTime getHorarioDesde() {
+    public Sede getSede() {
+        return sede;
+    }
+
+    public void setSede(Sede sede) {
+        this.sede = sede;
+    }
+
+    public LocalTime getHorarioDesde() {
         return horarioDesde;
     }
 
-    public void setHorarioDesde(LocalDateTime horarioDesde) {
-        this.horarioDesde = horarioDesde;
-    }
-
-    public LocalDateTime getHorarioHasta() {
+    public LocalTime getHorarioHasta() {
         return horarioHasta;
     }
 
-    public void setHorarioHasta(LocalDateTime horarioHasta) {
-        this.horarioHasta = horarioHasta;
-    }
 }
