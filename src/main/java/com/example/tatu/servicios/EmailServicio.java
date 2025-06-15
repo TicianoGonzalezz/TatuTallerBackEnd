@@ -26,24 +26,19 @@ public class EmailServicio {
         String emailProfesor = reserva.getClase().getProfesor().getEmail();
         String linkConfirmar = "http://localhost:8080/reservas/confirmar/" + reserva.getId();
         String linkRechazar = "http://localhost:8080/reservas/rechazar/" + reserva.getId();
-
-        SimpleMailMessage mensaje = new SimpleMailMessage();
-        mensaje.setTo(emailProfesor);
-        mensaje.setSubject("Nueva Reserva de Clase");
-        mensaje.setText(
-                "Hola " + reserva.getClase().getProfesor().getNombre() + ",\n\n" +
-                        "Tienes una nueva reserva de clase:\n" +
-                        "Usuario: " + reserva.getUsuario().getNombre() + "\n" +
-                        "Fecha: " + reserva.getClase().getDiaSemana() + "\n" +
-                        "Hora : " + reserva.getClase().getHorarioDesde() + " - " + reserva.getClase().getHorarioHasta()
-                        + "\n\n"
-                        +
-                        "Por favor, confirma o rechaza la reserva usando los siguientes enlaces:\n" +
-                        "Confirmar: " + linkConfirmar + "\n" +
-                        "Rechazar: " + linkRechazar + "\n\n" +
-                        "Saludos,\nEl equipo de Tatu");
-
-        mailSender.send(mensaje);
+        String asunto = "Nueva Reserva de Clase";
+        String mensaje = "Hola " + reserva.getClase().getProfesor().getNombre() + ",\n\n" +
+                "Tienes una nueva reserva de clase:\n" +
+                "Usuario: " + reserva.getUsuario().getNombre() + "\n" +
+                "Fecha: " + reserva.getFechaReserva() + "\n" +
+                "Hora : " + reserva.getClase().getHorarioDesde() + " - " + reserva.getClase().getHorarioHasta()
+                + "\n\n"
+                +
+                "Por favor, confirma o rechaza la reserva usando los siguientes enlaces:\n" +
+                "Confirmar: " + linkConfirmar + "\n" +
+                "Rechazar: " + linkRechazar + "\n\n" +
+                "Saludos,\nEl equipo de Tatu";
+        enviarMail(emailProfesor, asunto, mensaje);
     }
 
     // Método para enviar un correo de respuesta al usuario
@@ -60,7 +55,7 @@ public class EmailServicio {
         String mensajeTexto = aceptada
                 ? "Hola " + reserva.getUsuario().getNombre() + ",\n\n" +
                         "Tu reserva de clase ha sido aceptada.\n" +
-                        "Fecha: " + reserva.getClase().getDiaSemana() + "\n" +
+                        "Fecha: " + reserva.getFechaReserva() + "\n" +
                         "Hora: " + reserva.getClase().getHorarioDesde() + " - " + reserva.getClase().getHorarioHasta()
                         + "\n\n"
                         +
@@ -69,16 +64,27 @@ public class EmailServicio {
                         "Lamentablemente, tu reserva de clase ha sido rechazada.\n\n" +
                         "Saludos,\nEl equipo de Tatu";
 
-        SimpleMailMessage mail = new SimpleMailMessage();
-        mail.setTo(emailUsuario);
-        mail.setSubject(asunto);
-        mail.setText(mensajeTexto);
-        mailSender.send(mail);
+        enviarMail(emailUsuario, asunto, mensajeTexto);
 
     }
 
     public void enviarMailConfirmacionPorLote(List<ReservaClase> reservas) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'enviarMailConfirmacionPorLote'");
+        for (ReservaClase reserva : reservas) {
+            String destinatario = reserva.getClase().getProfesor().getEmail();
+            String asunto = "Nueva reserva mensual";
+            String mensaje = "Se ha realizado una reserva para la clase " + reserva.getClase().getNombre() +
+                    " el día " + reserva.getFechaReserva();
+            enviarMail(destinatario, asunto, mensaje);
+        }
     }
+
+    public void enviarMail(String destinatario, String asunto, String mensaje) {
+        SimpleMailMessage mail = new SimpleMailMessage();
+        mail.setTo(destinatario);
+        mail.setSubject(asunto);
+        mail.setText(mensaje);
+        mailSender.send(mail);
+    }
+
+   
 }
