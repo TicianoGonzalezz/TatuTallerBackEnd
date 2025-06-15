@@ -1,17 +1,24 @@
 package com.example.tatu.mapper;
 
-import java.time.LocalDateTime;
-import java.time.LocalTime;
-
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
-
 import com.example.tatu.dto.ClaseDTO;
 import com.example.tatu.entidades.Clase;
+import com.example.tatu.entidades.Sede;
+import com.example.tatu.entidades.Usuario;
+import com.example.tatu.repositorios.SedeRespositorio;
+import com.example.tatu.repositorios.UsuarioRepositorio;
+import java.time.LocalTime;
 
 @Component
 public class ClaseDTOMapper {
 
-    // Metodo para convertir de Clase a ClaseDTO
+    @Autowired
+    private UsuarioRepositorio usuarioRepositorio;
+
+    @Autowired
+    private SedeRespositorio sedeRepositorio;
+
     public ClaseDTO toDTO(Clase clase) {
         if (clase == null) {
             return null;
@@ -20,11 +27,11 @@ public class ClaseDTOMapper {
         dto.setId(clase.getId());
         dto.setNombre(clase.getNombre());
         dto.setDescripcion(clase.getDescripcion());
-        dto.setHoraDesde(clase.getHorarioDesde().toString());
-        dto.setHoraHasta(clase.getHorarioHasta().toString());
+        dto.setHoraDesde(clase.getHorarioDesde() != null ? clase.getHorarioDesde().toString() : null);
+        dto.setHoraHasta(clase.getHorarioHasta() != null ? clase.getHorarioHasta().toString() : null);
         dto.setDiaSemana(clase.getDiaSemana());
-        dto.setSedeId(clase.getSede().getId());
-        dto.setProfesorId(clase.getProfesor().getId());
+        dto.setSedeId(clase.getSede() != null ? clase.getSede().getId() : null);
+        dto.setProfesorId(clase.getProfesor() != null ? clase.getProfesor().getId() : null);
         return dto;
     }
 
@@ -37,15 +44,25 @@ public class ClaseDTOMapper {
         clase.setNombre(dto.getNombre());
         clase.setDescripcion(dto.getDescripcion());
         clase.setDiaSemana(dto.getDiaSemana());
-        clase.setHorarioDesde(LocalTime.parse(dto.getHoraDesde()));
-        clase.setHorarioHasta(LocalTime.parse(dto.getHoraHasta()));
-        // Aquí se debería buscar el profesor y la sede por sus IDs
-        // clase.setProfesor(usuarioRepositorio.findById(dto.getProfesorId()).orElse(null));
-        // clase.setSede(sedeRepositorio.findById(dto.getSedeId()).orElse(null));
-        // Por ahora, se deja como null para evitar problemas de dependencia circular
-        clase.setProfesor(null);
-        clase.setSede(null);
+        clase.setHorarioDesde(dto.getHoraDesde() != null ? LocalTime.parse(dto.getHoraDesde()) : null);
+        clase.setHorarioHasta(dto.getHoraHasta() != null ? LocalTime.parse(dto.getHoraHasta()) : null);
+
+        // Buscar y setear profesor
+        if (dto.getProfesorId() != null) {
+            Usuario profesor = usuarioRepositorio.findById(dto.getProfesorId()).orElse(null);
+            clase.setProfesor(profesor);
+        } else {
+            clase.setProfesor(null);
+        }
+
+        // Buscar y setear sede
+        if (dto.getSedeId() != null) {
+            Sede sede = sedeRepositorio.findById(dto.getSedeId()).orElse(null);
+            clase.setSede(sede);
+        } else {
+            clase.setSede(null);
+        }
+
         return clase;
     }
-
 }

@@ -36,6 +36,8 @@ public class ClaseControlador {
             ClaseDTO claseCreada = claseServicio.crear(dto);
             return ResponseEntity.status(HttpStatus.CREATED).body(claseCreada);
         } catch (Exception e) {
+            e.printStackTrace(); // <-- AGREGÁ ESTA LÍNEA
+
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error interno");
         }
     }
