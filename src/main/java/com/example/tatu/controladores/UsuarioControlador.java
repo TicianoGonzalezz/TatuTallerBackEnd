@@ -20,12 +20,6 @@ public class UsuarioControlador {
     @Autowired
     private UsuarioServicio usuarioServicio;
 
-    // get de prueba para verificar que el controlador está funcionando
-    @GetMapping("/prueba")
-    public ResponseEntity<String> prueba() {
-        return ResponseEntity.ok("Controlador de Usuario funcionando correctamente");
-    }
-
     // CREATE
     @PostMapping(value = "/crear", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<?> crearUsuario(
