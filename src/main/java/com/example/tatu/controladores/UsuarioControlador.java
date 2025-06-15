@@ -1,6 +1,8 @@
 package com.example.tatu.controladores;
 
+import com.example.tatu.JwtUtil;
 import com.example.tatu.dto.UsuarioDTO;
+import com.example.tatu.enumeraciones.Rol;
 import com.example.tatu.servicios.UsuarioServicio;
 import com.example.tatu.excepciones.MiException;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -8,10 +10,14 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.config.annotation.web.builders.HttpSecurity;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/usuario")
@@ -21,8 +27,42 @@ public class UsuarioControlador {
     private UsuarioServicio usuarioServicio;
 
     // CREATE
-    @PostMapping(value = "/crear", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    public ResponseEntity<?> crearUsuario(
+    @PostMapping(value = "/crearUsuarioDesdeUnAdministrador", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public ResponseEntity<?> crearUsuarioDesdeAdministrador(
+            @RequestPart("usuario") String usuarioJson,
+            @RequestPart(value = "archivo", required = false) MultipartFile archivo,
+            @RequestPart("password") String password,
+            @RequestPart("password2") String password2) {
+        try {
+            // Obtener el usuario autenticado
+            Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+            if (authentication == null || !authentication.isAuthenticated()) {
+                return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("No autorizado");
+            }
+
+            // Si quieres validar el rol ADMIN:
+            boolean isAdmin = authentication.getAuthorities().stream()
+                    .anyMatch(auth -> auth.getAuthority().equals("ROLE_ADMIN"));
+            if (!isAdmin) {
+                return ResponseEntity.status(HttpStatus.FORBIDDEN).body("No tiene permisos de administrador");
+            }
+
+            ObjectMapper mapper = new ObjectMapper();
+            UsuarioDTO usuarioDTO = mapper.readValue(usuarioJson, UsuarioDTO.class);
+
+            UsuarioDTO creado = usuarioServicio.registrar(usuarioDTO, archivo, password, password2);
+            return ResponseEntity.status(HttpStatus.CREATED).body(creado);
+        } catch (MiException e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
+        } catch (Exception e) {
+            e.printStackTrace();
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
+        }
+    }
+
+    // CREATE
+    @PostMapping(value = "/crearUsuarioDesdeAfuera", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public ResponseEntity<?> crearUsuarioDesdeAfuera(
             @RequestPart("usuario") String usuarioJson,
             @RequestPart(value = "archivo", required = false) MultipartFile archivo,
             @RequestParam String password,
@@ -30,6 +70,7 @@ public class UsuarioControlador {
         try {
             ObjectMapper mapper = new ObjectMapper();
             UsuarioDTO usuarioDTO = mapper.readValue(usuarioJson, UsuarioDTO.class);
+            usuarioDTO.setRol("ALUMNO");
             UsuarioDTO creado = usuarioServicio.registrar(usuarioDTO, archivo, password, password2);
             return ResponseEntity.status(HttpStatus.CREATED).body(creado);
         } catch (MiException e) {
@@ -93,7 +134,8 @@ public class UsuarioControlador {
     public ResponseEntity<?> login(@RequestParam String email, @RequestParam String password) {
         try {
             UsuarioDTO usuario = usuarioServicio.login(email, password);
-            return ResponseEntity.ok(usuario);
+            String token = JwtUtil.generateToken(email);
+            return ResponseEntity.ok().body(Map.of("token", token, "usuario", usuario));
         } catch (MiException e) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(e.getMessage());
         } catch (Exception e) {
