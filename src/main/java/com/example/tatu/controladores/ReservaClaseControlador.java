@@ -72,15 +72,15 @@ public class ReservaClaseControlador {
     }
 
     // 3. Confirmar/rechazar reserva (profesor)
-    @GetMapping("/confirmar")
-    public ResponseEntity<String> confirmar(@RequestParam Long reservaId) {
-        reservaClaseServicio.confirmarReserva(reservaId);
+    @GetMapping("/confirmar/{id}")
+    public ResponseEntity<String> confirmar(@PathVariable Long id) {
+        reservaClaseServicio.confirmarReserva(id);
         return ResponseEntity.ok("Reserva confirmada");
     }
 
-    @GetMapping("/rechazar")
-    public ResponseEntity<String> rechazar(@RequestParam Long reservaId) {
-        reservaClaseServicio.rechazarReserva(reservaId);
+    @GetMapping("/rechazar/{id}")
+    public ResponseEntity<String> rechazar(@PathVariable Long id) {
+        reservaClaseServicio.rechazarReserva(id);
         return ResponseEntity.ok("Reserva rechazada");
     }
 
