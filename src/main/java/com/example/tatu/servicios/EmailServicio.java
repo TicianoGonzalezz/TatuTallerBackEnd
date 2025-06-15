@@ -70,11 +70,21 @@ public class EmailServicio {
 
     public void enviarMailConfirmacionPorLote(List<ReservaClase> reservas) {
         for (ReservaClase reserva : reservas) {
-            String destinatario = reserva.getClase().getProfesor().getEmail();
-            String asunto = "Nueva reserva mensual";
-            String mensaje = "Se ha realizado una reserva para la clase " + reserva.getClase().getNombre() +
-                    " el día " + reserva.getFechaReserva();
-            enviarMail(destinatario, asunto, mensaje);
+            String emailProfesor = reserva.getClase().getProfesor().getEmail();
+            String linkConfirmar = "http://localhost:8080/reservas/confirmar/" + reserva.getId();
+            String linkRechazar = "http://localhost:8080/reservas/rechazar/" + reserva.getId();
+            String asunto = "Nueva Reserva de Clase (Reserva Mensual)";
+            String mensaje = "Hola " + reserva.getClase().getProfesor().getNombre() + ",\n\n" +
+                    "Tienes una nueva reserva de clase:\n" +
+                    "Usuario: " + reserva.getUsuario().getNombre() + "\n" +
+                    "Fecha: " + reserva.getFechaReserva() + "\n" +
+                    "Hora: " + reserva.getClase().getHorarioDesde() + " - " + reserva.getClase().getHorarioHasta()
+                    + "\n\n" +
+                    "Por favor, confirma o rechaza la reserva usando los siguientes enlaces:\n" +
+                    "Confirmar: " + linkConfirmar + "\n" +
+                    "Rechazar: " + linkRechazar + "\n\n" +
+                    "Saludos,\nEl equipo de Tatu";
+            enviarMail(emailProfesor, asunto, mensaje);
         }
     }
 
@@ -86,5 +96,4 @@ public class EmailServicio {
         mailSender.send(mail);
     }
 
-   
 }
