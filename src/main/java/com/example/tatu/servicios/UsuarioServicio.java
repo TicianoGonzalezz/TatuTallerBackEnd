@@ -50,6 +50,7 @@ public class UsuarioServicio implements UserDetailsService {
             usuarioDTO.setRol("ALUMNO");
             rol = "ALUMNO";
         }
+
         validarUsuarioRegistro(usuarioDTO.getNombre(), usuarioDTO.getEmail(), password, password2);
         Usuario usuario = usuarioDTOMapper.fromDTO(usuarioDTO);
         usuario.setRol(Rol.valueOf(rol.toUpperCase()));
