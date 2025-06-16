@@ -1,6 +1,7 @@
 package com.example.tatu.mapper;
 
 import java.time.LocalDateTime;
+import java.time.LocalTime;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -27,8 +28,8 @@ public class ReservaClaseDTOMapper {
         dto.setId(reserva.getId());
         dto.setUsuarioId(reserva.getUsuario().getId());
         dto.setClaseId(reserva.getClase().getId());
-        dto.sethorarioReservaDesde(reserva.getHorarioReservaDesde().toString());
         dto.setEstado(reserva.getEstado().name());
+        dto.setTipoReserva(reserva.getTipoReserva().toString());
         return dto;
     }
 
@@ -40,7 +41,6 @@ public class ReservaClaseDTOMapper {
         reserva.setId(dto.getId());
         reserva.setUsuario(usuarioRepositorio.findById(dto.getUsuarioId()).orElse(null));
         reserva.setClase(claseRepositorio.findById(dto.getClaseId()).orElse(null));
-        reserva.setHorarioReservaDesde(LocalDateTime.parse(dto.gethorarioReservaDesde()));
         reserva.setEstado(EstadoReserva.valueOf(dto.getEstado()));
         return reserva;
     }

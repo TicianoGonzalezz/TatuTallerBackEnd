@@ -4,10 +4,39 @@ public class ReservaClaseDTO {
     private Long id;
     private Long usuarioId;
     private Long claseId;
-    private String horarioReservaDesde;
-    private String estado;
+    private String nombreClase;
 
-    // Getters y Setters
+    public String getNombreClase() {
+        return nombreClase;
+    }
+
+    public void setNombreClase(String nombreClase) {
+        this.nombreClase = nombreClase;
+    }
+
+    private String horaDesde;
+    private String horaHasta;
+    private String estado;
+    private String profesor;
+
+    public String getProfesor() {
+        return profesor;
+    }
+
+    public void setProfesor(String profesor) {
+        this.profesor = profesor;
+    }
+
+    private String tipoReserva;
+
+    public String getTipoReserva() {
+        return tipoReserva;
+    }
+
+    public void setTipoReserva(String tipoReserva) {
+        this.tipoReserva = tipoReserva;
+    }
+
     public Long getId() {
         return id;
     }
@@ -32,12 +61,20 @@ public class ReservaClaseDTO {
         this.claseId = claseId;
     }
 
-    public String gethorarioReservaDesde() {
-        return horarioReservaDesde;
+    public String getHoraDesde() {
+        return horaDesde;
     }
 
-    public void sethorarioReservaDesde(String horarioReservaDesde) {
-        this.horarioReservaDesde = horarioReservaDesde;
+    public void setHoraDesde(String horaDesde) {
+        this.horaDesde = horaDesde;
+    }
+
+    public String getHoraHasta() {
+        return horaHasta;
+    }
+
+    public void setHoraHasta(String horaHasta) {
+        this.horaHasta = horaHasta;
     }
 
     public String getEstado() {
@@ -47,4 +84,7 @@ public class ReservaClaseDTO {
     public void setEstado(String estado) {
         this.estado = estado;
     }
+
+    // Getters y Setters
+
 }
