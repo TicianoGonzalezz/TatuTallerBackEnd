@@ -1,4 +1,5 @@
 package com.example.tatu.servicios;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -29,7 +30,7 @@ import jakarta.servlet.http.HttpSession;
 import jakarta.transaction.Transactional;
 
 @Service
-public class UsuarioServicio implements UserDetailsService{ 
+public class UsuarioServicio implements UserDetailsService {
 
     @Autowired
     private UsuarioRepositorio usuarioRepositorio;
@@ -42,25 +43,24 @@ public class UsuarioServicio implements UserDetailsService{
     @Autowired
     private UsuarioDTOMapper usuarioDTOMapper;
 
-    public UsuarioDTO registrar(UsuarioDTO usuarioDTO, MultipartFile archivo, String password, String password2) throws MiException {
+    public UsuarioDTO registrar(UsuarioDTO usuarioDTO, MultipartFile archivo, String password, String password2)
+            throws MiException {
         String rol = usuarioDTO.getRol();
         if (rol == null) {
             usuarioDTO.setRol("ALUMNO");
-        } else {
-            usuarioDTO.setRol(rol);
+            rol = "ALUMNO";
         }
 
         validarUsuarioRegistro(usuarioDTO.getNombre(), usuarioDTO.getEmail(), password, password2);
         Usuario usuario = usuarioDTOMapper.fromDTO(usuarioDTO);
         usuario.setRol(Rol.valueOf(rol.toUpperCase()));
-        usuario.setPassword(passwordEncoder.encode(password));     
+        usuario.setPassword(passwordEncoder.encode(password));
         Imagen imagen = imagenServicio.guardar(archivo);
         usuario.setImagen(imagen);
         usuarioRepositorio.save(usuario);
         return usuarioDTOMapper.toDTO(usuario);
     }
 
-   
     public UsuarioDTO buscarPorIdDTO(Long id) {
         Optional<Usuario> respuesta = usuarioRepositorio.findById(id);
         if (respuesta.isPresent()) {
@@ -69,13 +69,13 @@ public class UsuarioServicio implements UserDetailsService{
             return null; // O lanzar una excepción si prefieres
         }
     }
-    
+
     public List<UsuarioDTO> listarUsuariosDTO() {
         return usuarioRepositorio.findAll().stream()
-            .map(usuarioDTOMapper::toDTO)
-            .collect(Collectors.toList());
+                .map(usuarioDTOMapper::toDTO)
+                .collect(Collectors.toList());
     }
-    
+
     public void eliminar(Long id) throws MiException {
         Optional<Usuario> respuesta = usuarioRepositorio.findById(id);
         if (respuesta.isPresent()) {
@@ -85,9 +85,8 @@ public class UsuarioServicio implements UserDetailsService{
         }
     }
 
-    
-
-    private void validarUsuarioRegistro(String nombre, String email, String password, String password2) throws MiException {
+    private void validarUsuarioRegistro(String nombre, String email, String password, String password2)
+            throws MiException {
         if (nombre == null || nombre.trim().isEmpty()) {
             throw new MiException("El nombre es obligatorio");
         }
@@ -113,19 +112,21 @@ public class UsuarioServicio implements UserDetailsService{
     }
 
     @Transactional
-    public UsuarioDTO actualizar(Long id, UsuarioDTO usuarioDTO, MultipartFile archivo, String password, String password2) throws MiException {
+    public UsuarioDTO actualizar(Long id, UsuarioDTO usuarioDTO, MultipartFile archivo, String password,
+            String password2) throws MiException {
         Optional<Usuario> respuesta = usuarioRepositorio.findById(id);
         if (respuesta.isPresent()) {
             Usuario usuario = respuesta.get();
 
             // VALIDAR TODO ANTES DE MODIFICAR
-            if (usuarioDTO.getNombre() != null && usuarioDTO.getNombre().isEmpty() && usuario.getNombre().length()<4) {
+            if (usuarioDTO.getNombre() != null && usuarioDTO.getNombre().isEmpty()
+                    && usuario.getNombre().length() < 4) {
                 throw new MiException("El nombre no puede estar vacío y debe tener al menos 4 letras");
             }
-            if (usuarioDTO.getEmail() != null && usuarioDTO.getEmail().isEmpty() ) {
+            if (usuarioDTO.getEmail() != null && usuarioDTO.getEmail().isEmpty()) {
                 throw new MiException("El email no puede estar vacío");
             }
-            if(usuarioDTO.getEmail() != null && !usuarioDTO.getEmail().equals(respuesta.get().getEmail())) {
+            if (usuarioDTO.getEmail() != null && !usuarioDTO.getEmail().equals(respuesta.get().getEmail())) {
                 Usuario usuarioExistente = usuarioRepositorio.findByEmail(usuarioDTO.getEmail());
                 if (usuarioExistente != null && !usuarioExistente.getId().equals(id)) {
                     throw new MiException("Ya existe un usuario con ese email");
@@ -168,25 +169,23 @@ public class UsuarioServicio implements UserDetailsService{
     }
 
     public boolean validarContrasena(String contrasena) throws MiException {
-    if (contrasena == null || contrasena.isEmpty()) {
-        throw new MiException("La contraseña no puede estar vacía");
+        if (contrasena == null || contrasena.isEmpty()) {
+            throw new MiException("La contraseña no puede estar vacía");
+        }
+        if (contrasena.length() < 8) {
+            throw new MiException("La contraseña debe tener al menos 8 caracteres");
+        }
+        if (!contrasena.matches(".*[A-Za-z].*")) {
+            throw new MiException("La contraseña debe contener al menos una letra");
+        }
+        if (!contrasena.matches(".*\\d.*")) {
+            throw new MiException("La contraseña debe contener al menos un número");
+        }
+        if (!contrasena.matches(".*[@$!%*#?&].*")) {
+            throw new MiException("La contraseña debe contener al menos un carácter especial (@$!%*#?&)");
+        }
+        return true;
     }
-    if (contrasena.length() < 8) {
-        throw new MiException("La contraseña debe tener al menos 8 caracteres");
-    }
-    if (!contrasena.matches(".*[A-Za-z].*")) {
-        throw new MiException("La contraseña debe contener al menos una letra");
-    }
-    if (!contrasena.matches(".*\\d.*")) {
-        throw new MiException("La contraseña debe contener al menos un número");
-    }
-    if (!contrasena.matches(".*[@$!%*#?&].*")) {
-        throw new MiException("La contraseña debe contener al menos un carácter especial (@$!%*#?&)");
-    }
-    return true;
-}
-
-
 
     public UsuarioDTO login(String email, String password) throws MiException {
         Usuario usuario = usuarioRepositorio.findByEmail(email);
@@ -199,6 +198,20 @@ public class UsuarioServicio implements UserDetailsService{
         return usuarioDTOMapper.toDTO(usuario);
     }
 
+    public UsuarioDTO loginGoogle(String email, String nombre) {
+        Usuario usuario = usuarioRepositorio.findByEmail(email);
+        if (usuario == null) {
+            Usuario nuevo = new Usuario();
+            nuevo.setEmail(email);
+            nuevo.setNombre(nombre);
+            nuevo.setRol(Rol.ALUMNO); 
+            nuevo.setPassword(passwordEncoder.encode("google_login_" + email));
+            usuario = usuarioRepositorio.save(nuevo);
+        }
+        return usuarioDTOMapper.toDTO(usuario);
+    }
+
+
 
     @Override
     public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
@@ -207,12 +220,13 @@ public class UsuarioServicio implements UserDetailsService{
             List<GrantedAuthority> permisos = new ArrayList<>();
             GrantedAuthority p = new SimpleGrantedAuthority("ROLE_" + usuario.getRol().toString());
             permisos.add(p);
-            ServletRequestAttributes attributes= (ServletRequestAttributes) RequestContextHolder.currentRequestAttributes();
+            ServletRequestAttributes attributes = (ServletRequestAttributes) RequestContextHolder
+                    .currentRequestAttributes();
             HttpSession session = attributes.getRequest().getSession(true);
             session.setAttribute("usuariosession", usuario); // Guardamos el usuario en la sesión
-           return new User(usuario.getEmail(), usuario.getPassword(), permisos);
+            return new User(usuario.getEmail(), usuario.getPassword(), permisos);
 
-        }else {
+        } else {
             return null; // Si el usuario no existe, retornamos null
         }
     }

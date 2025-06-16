@@ -9,7 +9,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
-
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.example.tatu.dto.ClaseDTO;
@@ -36,6 +36,8 @@ public class ClaseControlador {
             ClaseDTO claseCreada = claseServicio.crear(dto);
             return ResponseEntity.status(HttpStatus.CREATED).body(claseCreada);
         } catch (Exception e) {
+            e.printStackTrace(); // <-- AGREGÁ ESTA LÍNEA
+
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error interno");
         }
     }
