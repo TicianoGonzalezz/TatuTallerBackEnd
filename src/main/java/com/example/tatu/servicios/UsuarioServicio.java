@@ -200,6 +200,20 @@ public class UsuarioServicio implements UserDetailsService{
     }
 
 
+    public UsuarioDTO loginGoogle(String email, String nombre) {
+        Usuario usuario = usuarioRepositorio.findByEmail(email);
+        if (usuario == null) {
+            Usuario nuevo = new Usuario();
+            nuevo.setEmail(email);
+            nuevo.setNombre(nombre);
+            nuevo.setRol(Rol.ALUMNO); 
+            nuevo.setPassword(passwordEncoder.encode("google_login_" + email));
+            usuario = usuarioRepositorio.save(nuevo);
+        }
+        return usuarioDTOMapper.toDTO(usuario);
+    }
+
+
     @Override
     public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
         Usuario usuario = usuarioRepositorio.findByEmail(email);

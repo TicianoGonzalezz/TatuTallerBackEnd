@@ -6,6 +6,10 @@ import com.example.tatu.enumeraciones.Rol;
 import com.example.tatu.servicios.UsuarioServicio;
 import com.example.tatu.excepciones.MiException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.google.api.client.googleapis.auth.oauth2.GoogleIdToken;
+import com.google.api.client.googleapis.auth.oauth2.GoogleIdTokenVerifier;
+import com.google.api.client.googleapis.javanet.GoogleNetHttpTransport;
+import com.google.api.client.json.gson.GsonFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -16,6 +20,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
@@ -136,16 +141,48 @@ public class UsuarioControlador {
     }
 
     // LOGIN
-    @PostMapping("/login")
-    public ResponseEntity<?> login(@RequestParam String email, @RequestParam String password) {
+     @PostMapping("/login")
+     public ResponseEntity<?> login(@RequestParam String email, @RequestParam String password) {
         try {
             UsuarioDTO usuario = usuarioServicio.login(email, password);
             String token = JwtUtil.generateToken(email);
             return ResponseEntity.ok().body(Map.of("token", token, "usuario", usuario));
         } catch (MiException e) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(e.getMessage());
-        } catch (Exception e) {
+           return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(e.getMessage());
+       } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error interno");
+        }
+    }
+
+    // LOGIN CON GOOGLE
+    @PostMapping("/login-google")
+    public ResponseEntity<?> loginGoogle(@RequestBody Map<String, String> body) {
+        try {
+            String idTokenString = body.get("token");
+            GoogleIdTokenVerifier verifier = new GoogleIdTokenVerifier.Builder(
+                    GoogleNetHttpTransport.newTrustedTransport(),
+                    GsonFactory.getDefaultInstance())
+                    .setAudience(Collections.singletonList("737455985650-mdp35pj783ms660iu8c3tvc63pl13hga.apps.googleusercontent.com"))
+                    .build();
+
+            GoogleIdToken idToken = verifier.verify(idTokenString);
+            if (idToken != null) {
+                GoogleIdToken.Payload payload = idToken.getPayload();
+                String email = payload.getEmail();
+                String nombre = (String) payload.get("name");
+
+                // Busca o crea el usuario en tu sistema
+                UsuarioDTO usuario = usuarioServicio.loginGoogle(email, nombre);
+
+                // Genera tu propio JWT
+                String token = JwtUtil.generateToken(email);
+
+                return ResponseEntity.ok().body(Map.of("token", token, "usuario", usuario));
+            } else {
+                return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Token de Google inválido");
+            }
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error interno: " + e.getMessage());
         }
     }
 
